@@ -1,8 +1,5 @@
-const GITHUB_USER = "k33n26";
-const GITHUB_REPO = "yt-live-proxy";
-
 const CHANNELS_URL =
-`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/channels.json`;
+"https://raw.githubusercontent.com/k33n26/yt-live-proxy/main/channels.json";
 
 async function getChannels() {
   const r = await fetch(CHANNELS_URL);
@@ -10,87 +7,115 @@ async function getChannels() {
 }
 
 
-// 🔥 GERÇEK FIX: get_video_info yöntemi
+// 🔥 MULTI-TRY LIVE FETCH
 async function getLive(videoId) {
 
-  const url =
-    `https://www.youtube.com/get_video_info?video_id=${videoId}&hl=en`;
+  const urls = [
 
-  const r = await fetch(url);
+    // 1 - android
+    "https://www.youtube.com/youtubei/v1/player",
 
-  const text = await r.text();
+    // 2 - web
+    "https://www.youtube.com/youtubei/v1/player?key=web",
 
-  const params = new URLSearchParams(text);
+    // 3 - legacy
+    `https://www.youtube.com/get_video_info?video_id=${videoId}`
 
-  let playerResponse;
+  ];
 
-  try {
-    playerResponse = JSON.parse(
-      params.get("player_response") || "{}"
-    );
-  } catch (e) {
-    return null;
+
+  for (const u of urls) {
+
+    try {
+
+      let res;
+
+      if (u.includes("youtubei")) {
+
+        res = await fetch(u, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json"
+          },
+          body: JSON.stringify({
+            videoId,
+            context: {
+              client: {
+                clientName: "ANDROID",
+                clientVersion: "20.10.38"
+              }
+            }
+          })
+        });
+
+        const json = await res.json();
+
+        const hls =
+          json?.streamingData?.hlsManifestUrl;
+
+        if (hls) return hls;
+
+      } else {
+
+        res = await fetch(u);
+
+        const text = await res.text();
+
+        const params = new URLSearchParams(text);
+
+        const pr = JSON.parse(
+          params.get("player_response") || "{}"
+        );
+
+        const hls =
+          pr?.streamingData?.hlsManifestUrl;
+
+        if (hls) return hls;
+
+      }
+
+    } catch (e) {
+      continue;
+    }
   }
 
-  return playerResponse
-    ?.streamingData
-    ?.hlsManifestUrl || null;
+  return null;
 }
 
 
-// m3u8 redirect
 export default {
 
   async fetch(req) {
 
-    try {
+    const url = new URL(req.url);
 
-      const url = new URL(req.url);
+    const name = url.pathname
+      .replace("/", "")
+      .replace(".m3u8", "");
 
-      const name = url.pathname
-        .replace("/", "")
-        .replace(".m3u8", "");
+    const channels = await getChannels();
 
-      const channels = await getChannels();
+    const videoId = channels[name] || name;
 
-      const videoId = channels[name] || name;
+    const manifest = await getLive(videoId);
 
-      const manifest = await getLive(videoId);
-
-      if (!manifest) {
-        return new Response(
-          JSON.stringify({
-            error: "live not found",
-            videoId
-          }),
-          {
-            status: 404,
-            headers: {
-              "content-type": "application/json"
-            }
-          }
-        );
-      }
-
-      const stream = await fetch(manifest);
-
-      return new Response(stream.body, {
-        headers: {
-          "content-type":
-            "application/vnd.apple.mpegurl",
-          "Access-Control-Allow-Origin": "*",
-          "Cache-Control": "public,max-age=10"
-        }
-      });
-
-    } catch (e) {
-
+    if (!manifest) {
       return new Response(
-        e.toString(),
-        { status: 500 }
+        "live not found",
+        { status: 404 }
       );
-
     }
+
+    const stream = await fetch(manifest);
+
+    return new Response(stream.body, {
+      headers: {
+        "content-type":
+          "application/vnd.apple.mpegurl",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-cache"
+      }
+    });
 
   }
 
