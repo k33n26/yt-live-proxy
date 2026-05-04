@@ -13,8 +13,9 @@ async function getChannels() {
 
 async function getManifest(videoId) {
 
+  // embed endpoint daha stabil
   const page = await fetch(
-    `https://www.youtube.com/watch?v=${videoId}`,
+    `https://www.youtube.com/embed/${videoId}`,
     {
       headers: {
         "user-agent":
@@ -23,17 +24,30 @@ async function getManifest(videoId) {
     }
   );
 
-  const html = await page.text();
+  const html =
+    await page.text();
 
 
-  // yeni yöntem
-  const match = html.match(
+  let match = html.match(
     /"hlsManifestUrl":"([^"]+)"/
   );
 
   if (!match) {
-    return null;
+
+    // fallback
+    match = html.match(
+      /https:\\\/\\\/manifest\.googlevideo\.com[^"]+/i
+    );
+
+    if (!match) {
+      return null;
+    }
+
+    return match[0]
+      .replace(/\\u0026/g, "&")
+      .replace(/\\/g, "");
   }
+
 
   return match[1]
     .replace(/\\u0026/g, "&")
@@ -88,7 +102,9 @@ export default {
             "content-type":
               "application/vnd.apple.mpegurl",
             "Access-Control-Allow-Origin":
-              "*"
+              "*",
+            "Cache-Control":
+              "public,max-age=15"
           }
         }
       );
