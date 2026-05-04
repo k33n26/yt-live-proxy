@@ -1,135 +1,77 @@
-const GITHUB_USER = "k33n26";
-const GITHUB_REPO = "yt-live-proxy";
-const GITHUB_BRANCH = "main";
+const GITHUB_USER="k33n26";
+const GITHUB_REPO="yt-live-proxy";
 
-const CHANNELS_URL =
-  `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/channels.json`;
+const CHANNELS_URL=
+`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/channels.json`;
 
-let cache = null;
-let cacheTime = 0;
-
-async function getChannels() {
-
-  if (
-    cache &&
-    (Date.now() - cacheTime) < 60000
-  ) {
-    return cache;
-  }
-
-  const r = await fetch(CHANNELS_URL, {
-    cf: {
-      cacheTtl: 60
-    }
-  });
-
-  const json = await r.json();
-
-  cache = json;
-  cacheTime = Date.now();
-
-  return json;
+async function getChannels(){
+  const r=await fetch(CHANNELS_URL);
+  return await r.json();
 }
 
+async function getManifest(videoId){
 
-function extractId(pathname) {
-
-  return pathname
-    .replace(/^\/+/, "")
-    .replace(".m3u8", "")
-    .trim();
-}
-
-
-async function getYoutubeHls(channelId) {
-
-  const yt = `https://www.youtube.com/channel/${channelId}/live`;
-
-  const page = await fetch(yt, {
-    headers: {
-      "user-agent":
-        "Mozilla/5.0"
+  const page=await fetch(
+    `https://www.youtube.com/watch?v=${videoId}`,
+    {
+      headers:{
+        "user-agent":"Mozilla/5.0"
+      }
     }
-  });
+  );
 
-  const html = await page.text();
+  const html=await page.text();
 
-  const match = html.match(
+  const match=html.match(
     /https:\\\/\\\/manifest\.googlevideo\.com[^"]+/i
   );
 
-  if (!match) {
-    return null;
-  }
+  if(!match) return null;
 
   return match[0]
-    .replace(/\\u0026/g, "&")
-    .replace(/\\/g, "");
+    .replace(/\\u0026/g,"&")
+    .replace(/\\/g,"");
 }
-
 
 export default {
 
-  async fetch(req) {
+  async fetch(req){
 
-    try {
+    const url=new URL(req.url);
 
-      const url = new URL(req.url);
+    const name=url.pathname
+      .replace("/","")
+      .replace(".m3u8","");
 
-      let channelName =
-        extractId(url.pathname);
+    const channels=
+      await getChannels();
 
-      if (!channelName) {
-        return new Response(
-          "channel missing",
-          { status: 400 }
-        );
-      }
+    const videoId=
+      channels[name]||name;
 
-      const channels =
-        await getChannels();
+    const manifest=
+      await getManifest(videoId);
 
-      const channelId =
-        channels[channelName] ||
-        channelName;
-
-      const hls =
-        await getYoutubeHls(
-          channelId
-        );
-
-      if (!hls) {
-        return new Response(
-          "live not found",
-          { status: 404 }
-        );
-      }
-
-      const stream =
-        await fetch(hls);
-
+    if(!manifest){
       return new Response(
-        stream.body,
-        {
-          headers: {
-            "content-type":
-              "application/vnd.apple.mpegurl",
-            "Access-Control-Allow-Origin":
-              "*",
-            "Cache-Control":
-              "public,max-age=20"
-          }
-        }
+        "not live",
+        {status:404}
       );
-
-    } catch (e) {
-
-      return new Response(
-        e.toString(),
-        { status: 500 }
-      );
-
     }
+
+    const stream=
+      await fetch(manifest);
+
+    return new Response(
+      stream.body,
+      {
+        headers:{
+          "content-type":
+          "application/vnd.apple.mpegurl",
+          "Access-Control-Allow-Origin":"*"
+        }
+      }
+    );
 
   }
 
