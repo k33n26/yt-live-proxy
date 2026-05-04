@@ -4,10 +4,12 @@ const GITHUB_REPO = "yt-live-proxy";
 const CHANNELS_URL =
 `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/channels.json`;
 
+
 async function getChannels() {
   const r = await fetch(CHANNELS_URL);
   return await r.json();
 }
+
 
 async function getManifest(videoId) {
 
@@ -15,23 +17,29 @@ async function getManifest(videoId) {
     `https://www.youtube.com/watch?v=${videoId}`,
     {
       headers: {
-        "user-agent": "Mozilla/5.0"
+        "user-agent":
+          "Mozilla/5.0"
       }
     }
   );
 
   const html = await page.text();
 
+
+  // yeni yöntem
   const match = html.match(
-    /https:\\\/\\\/manifest\.googlevideo\.com[^"]+/i
+    /"hlsManifestUrl":"([^"]+)"/
   );
 
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
 
-  return match[0]
+  return match[1]
     .replace(/\\u0026/g, "&")
     .replace(/\\/g, "");
 }
+
 
 export default {
 
@@ -39,20 +47,25 @@ export default {
 
     try {
 
-      const url = new URL(req.url);
+      const url =
+        new URL(req.url);
 
-      const name = url.pathname
-        .replace("/", "")
-        .replace(".m3u8", "");
+      const name =
+        url.pathname
+          .replace("/", "")
+          .replace(".m3u8", "");
 
       const channels =
         await getChannels();
 
       const videoId =
-        channels[name] || name;
+        channels[name] ||
+        name;
 
       const manifest =
-        await getManifest(videoId);
+        await getManifest(
+          videoId
+        );
 
       if (!manifest) {
 
@@ -64,7 +77,9 @@ export default {
       }
 
       const stream =
-        await fetch(manifest);
+        await fetch(
+          manifest
+        );
 
       return new Response(
         stream.body,
@@ -72,9 +87,8 @@ export default {
           headers: {
             "content-type":
               "application/vnd.apple.mpegurl",
-            "Access-Control-Allow-Origin": "*",
-            "Cache-Control":
-              "public,max-age=20"
+            "Access-Control-Allow-Origin":
+              "*"
           }
         }
       );
