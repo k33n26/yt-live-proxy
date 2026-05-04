@@ -4,86 +4,93 @@ const GITHUB_REPO = "yt-live-proxy";
 const CHANNELS_URL =
 `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/channels.json`;
 
-
 async function getChannels() {
   const r = await fetch(CHANNELS_URL);
   return await r.json();
 }
 
 
+// 🔥 GERÇEK FIX: get_video_info yöntemi
 async function getLive(videoId) {
 
-  const r = await fetch(
-    "https://www.youtube.com/youtubei/v1/player?prettyPrint=false",
-    {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        videoId,
-        context: {
-          client: {
-            clientName: "ANDROID",
-            clientVersion: "20.10.38"
-          }
-        }
-      })
-    }
-  );
+  const url =
+    `https://www.youtube.com/get_video_info?video_id=${videoId}&hl=en`;
 
-  const json = await r.json();
+  const r = await fetch(url);
 
-  return json?.streamingData?.hlsManifestUrl || null;
+  const text = await r.text();
+
+  const params = new URLSearchParams(text);
+
+  let playerResponse;
+
+  try {
+    playerResponse = JSON.parse(
+      params.get("player_response") || "{}"
+    );
+  } catch (e) {
+    return null;
+  }
+
+  return playerResponse
+    ?.streamingData
+    ?.hlsManifestUrl || null;
 }
 
 
+// m3u8 redirect
 export default {
 
   async fetch(req) {
 
-    const url = new URL(req.url);
+    try {
 
-    const name = url.pathname
-      .replace("/", "")
-      .replace(".m3u8", "");
+      const url = new URL(req.url);
 
-    const channels = await getChannels();
+      const name = url.pathname
+        .replace("/", "")
+        .replace(".m3u8", "");
 
-    const videoId = channels[name] || name;
+      const channels = await getChannels();
 
+      const videoId = channels[name] || name;
 
-    const manifest = await getLive(videoId);
+      const manifest = await getLive(videoId);
 
+      if (!manifest) {
+        return new Response(
+          JSON.stringify({
+            error: "live not found",
+            videoId
+          }),
+          {
+            status: 404,
+            headers: {
+              "content-type": "application/json"
+            }
+          }
+        );
+      }
 
-    // ❗ burada kritik debug
-    if (!manifest) {
+      const stream = await fetch(manifest);
+
+      return new Response(stream.body, {
+        headers: {
+          "content-type":
+            "application/vnd.apple.mpegurl",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "public,max-age=10"
+        }
+      });
+
+    } catch (e) {
 
       return new Response(
-        JSON.stringify({
-          error: "live not found",
-          videoId
-        }),
-        {
-          status: 404,
-          headers: {
-            "content-type": "application/json"
-          }
-        }
+        e.toString(),
+        { status: 500 }
       );
 
     }
-
-
-    const stream = await fetch(manifest);
-
-    return new Response(stream.body, {
-      headers: {
-        "content-type":
-          "application/vnd.apple.mpegurl",
-        "Access-Control-Allow-Origin": "*"
-      }
-    });
 
   }
 
