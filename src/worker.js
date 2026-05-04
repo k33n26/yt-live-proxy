@@ -13,46 +13,41 @@ async function getChannels() {
 
 async function getManifest(videoId) {
 
-  // embed endpoint daha stabil
-  const page = await fetch(
-    `https://www.youtube.com/embed/${videoId}`,
+  const r = await fetch(
+    `https://www.youtube.com/youtubei/v1/player?prettyPrint=false`,
     {
+      method: "POST",
+
       headers: {
-        "user-agent":
-          "Mozilla/5.0"
-      }
+        "content-type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+
+        videoId: videoId,
+
+        context: {
+          client: {
+            clientName: "WEB",
+            clientVersion:
+              "2.20260501.00.00"
+          }
+        }
+
+      })
+
     }
   );
 
-  const html =
-    await page.text();
+
+  const json =
+    await r.json();
 
 
-  let match = html.match(
-    /"hlsManifestUrl":"([^"]+)"/
-  );
-
-  if (!match) {
-
-    // fallback
-    match = html.match(
-      /https:\\\/\\\/manifest\.googlevideo\.com[^"]+/i
-    );
-
-    if (!match) {
-      return null;
-    }
-
-    return match[0]
-      .replace(/\\u0026/g, "&")
-      .replace(/\\/g, "");
-  }
-
-
-  return match[1]
-    .replace(/\\u0026/g, "&")
-    .replace(/\\/g, "");
+  return json?.streamingData?.hlsManifestUrl || null;
 }
+
 
 
 export default {
@@ -76,10 +71,12 @@ export default {
         channels[name] ||
         name;
 
+
       const manifest =
         await getManifest(
           videoId
         );
+
 
       if (!manifest) {
 
@@ -90,10 +87,12 @@ export default {
 
       }
 
+
       const stream =
         await fetch(
           manifest
         );
+
 
       return new Response(
         stream.body,
