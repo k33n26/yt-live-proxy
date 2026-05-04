@@ -1,4 +1,14 @@
 {
-  "trtnostalji": "jvC6-s5exnI",
-  "bizimevtv": "__e4W3yB_ZQ"
+  "trtnostalji": {
+    "type": "youtube",
+    "id": "jvC6-s5exnI"
+  },
+  "bizimev": {
+    "type": "youtube",
+    "id": "__e4W3yB_ZQ"
+  },
+  "halktv": {
+    "type": "youtube",
+    "id": "8uNelFh0oz4"
+  }
 }
