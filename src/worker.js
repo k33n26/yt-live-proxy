@@ -1,3 +1,4 @@
+
 const CHANNELS_URL =
 "https://raw.githubusercontent.com/k33n26/yt-live-proxy/main/channels.json";
 
@@ -7,32 +8,33 @@ async function getChannels() {
 }
 
 
-// 🔥 MULTI-TRY LIVE FETCH
-async function getLive(videoId) {
+// 🔥 YOUTUBE RESOLVER (stabil fallback)
+async function resolveYouTube(videoId) {
 
-  const urls = [
+  const endpoints = [
 
-    // 1 - android
-    "https://www.youtube.com/youtubei/v1/player",
+    {
+      url: "https://www.youtube.com/youtubei/v1/player",
+      type: "post"
+    },
 
-    // 2 - web
-    "https://www.youtube.com/youtubei/v1/player?key=web",
-
-    // 3 - legacy
-    `https://www.youtube.com/get_video_info?video_id=${videoId}`
+    {
+      url: "https://www.youtube.com/get_video_info",
+      type: "get"
+    }
 
   ];
 
 
-  for (const u of urls) {
+  for (const ep of endpoints) {
 
     try {
 
       let res;
 
-      if (u.includes("youtubei")) {
+      if (ep.type === "post") {
 
-        res = await fetch(u, {
+        res = await fetch(ep.url, {
           method: "POST",
           headers: {
             "content-type": "application/json"
@@ -57,7 +59,9 @@ async function getLive(videoId) {
 
       } else {
 
-        res = await fetch(u);
+        res = await fetch(
+          `${ep.url}?video_id=${videoId}&hl=en`
+        );
 
         const text = await res.text();
 
@@ -77,12 +81,14 @@ async function getLive(videoId) {
     } catch (e) {
       continue;
     }
+
   }
 
   return null;
 }
 
 
+// 🔥 MAIN HANDLER
 export default {
 
   async fetch(req) {
@@ -95,18 +101,30 @@ export default {
 
     const channels = await getChannels();
 
-    const videoId = channels[name] || name;
+    const channel = channels[name];
 
-    const manifest = await getLive(videoId);
+    if (!channel) {
+      return new Response("not found", { status: 404 });
+    }
 
-    if (!manifest) {
+
+    let streamUrl = null;
+
+
+    if (channel.type === "youtube") {
+      streamUrl = await resolveYouTube(channel.id);
+    }
+
+
+    if (!streamUrl) {
       return new Response(
-        "live not found",
+        "stream not available",
         { status: 404 }
       );
     }
 
-    const stream = await fetch(manifest);
+
+    const stream = await fetch(streamUrl);
 
     return new Response(stream.body, {
       headers: {
