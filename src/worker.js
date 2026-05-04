@@ -14,13 +14,12 @@ async function getChannels() {
 async function getManifest(videoId) {
 
   const r = await fetch(
-    `https://www.youtube.com/youtubei/v1/player?prettyPrint=false`,
+    "https://www.youtube.com/youtubei/v1/player?prettyPrint=false",
     {
       method: "POST",
 
       headers: {
-        "content-type":
-          "application/json"
+        "content-type": "application/json"
       },
 
       body: JSON.stringify({
@@ -28,11 +27,17 @@ async function getManifest(videoId) {
         videoId: videoId,
 
         context: {
+
           client: {
-            clientName: "WEB",
-            clientVersion:
-              "2.20260501.00.00"
+
+            clientName: "ANDROID",
+
+            clientVersion: "20.10.38",
+
+            androidSdkVersion: 30
+
           }
+
         }
 
       })
@@ -41,10 +46,9 @@ async function getManifest(videoId) {
   );
 
 
-  const json =
-    await r.json();
+  const json = await r.json();
 
-
+  // debug istersen burada json döndürebiliriz
   return json?.streamingData?.hlsManifestUrl || null;
 }
 
@@ -56,26 +60,21 @@ export default {
 
     try {
 
-      const url =
-        new URL(req.url);
+      const url = new URL(req.url);
 
-      const name =
-        url.pathname
-          .replace("/", "")
-          .replace(".m3u8", "");
+      const name = url.pathname
+        .replace("/", "")
+        .replace(".m3u8", "");
 
       const channels =
         await getChannels();
 
       const videoId =
-        channels[name] ||
-        name;
+        channels[name] || name;
 
 
       const manifest =
-        await getManifest(
-          videoId
-        );
+        await getManifest(videoId);
 
 
       if (!manifest) {
@@ -89,9 +88,7 @@ export default {
 
 
       const stream =
-        await fetch(
-          manifest
-        );
+        await fetch(manifest);
 
 
       return new Response(
@@ -101,9 +98,7 @@ export default {
             "content-type":
               "application/vnd.apple.mpegurl",
             "Access-Control-Allow-Origin":
-              "*",
-            "Cache-Control":
-              "public,max-age=15"
+              "*"
           }
         }
       );
