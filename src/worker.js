@@ -1,35 +1,28 @@
 const CHANNELS_URL =
 "https://raw.githubusercontent.com/k33n26/yt-live-proxy/main/channels.json";
 
-const manifestCache = new Map();
+const cache = new Map();
 
 
 async function getChannels() {
-  const r = await fetch(CHANNELS_URL, {
-    cf: { cacheTtl: 60 }
-  });
-
+  const r = await fetch(CHANNELS_URL);
   return await r.json();
 }
 
 
-// cache
-function getCached(videoId, allowExpired = false){
+function getCache(videoId){
 
   const item =
-    manifestCache.get(videoId);
+    cache.get(videoId);
 
   if(!item) return null;
 
   if(
-    Date.now() > item.expire
+    Date.now() >
+    item.expire
   ){
 
-    if(allowExpired){
-      return item.url;
-    }
-
-    manifestCache.delete(
+    cache.delete(
       videoId
     );
 
@@ -45,60 +38,30 @@ function setCache(
   url
 ){
 
-  manifestCache.set(
+  cache.set(
     videoId,
     {
       url,
 
       expire:
-        Date.now() + 60000
+        Date.now() + 30000
     }
   );
 
 }
 
 
-// manifest gerçekten yaşıyor mu?
-async function isAlive(url){
 
-  try{
-
-    const r =
-      await fetch(
-        url,
-        {
-          method:"HEAD"
-        }
-      );
-
-    return r.ok;
-
-  }catch(e){
-
-    return false;
-
-  }
-
-}
-
-
-// youtube resolve
 async function resolveYouTube(
   videoId
 ){
 
-  // önce cache
   const cached =
-    getCached(
+    getCache(
       videoId
     );
 
-  if(
-    cached &&
-    await isAlive(
-      cached
-    )
-  ){
+  if(cached){
     return cached;
   }
 
@@ -119,14 +82,6 @@ async function resolveYouTube(
 
       clientVersion:
         "7.202.0"
-    },
-
-    {
-      clientName:
-        "IOS",
-
-      clientVersion:
-        "20.10.4"
     }
 
   ];
@@ -147,7 +102,10 @@ async function resolveYouTube(
 
             headers:{
               "content-type":
-                "application/json"
+                "application/json",
+
+              "Connection":
+                "keep-alive"
             },
 
             body:
@@ -174,12 +132,7 @@ async function resolveYouTube(
           ?.hlsManifestUrl;
 
 
-      if(
-        hls &&
-        await isAlive(
-          hls
-        )
-      ){
+      if(hls){
 
         setCache(
           videoId,
@@ -197,120 +150,7 @@ async function resolveYouTube(
   }
 
 
-  // stale cache fallback
-  const stale =
-    getCached(
-      videoId,
-      true
-    );
-
-  if(
-    stale &&
-    await isAlive(
-      stale
-    )
-  ){
-    return stale;
-  }
-
-
   return null;
-}
-
-
-
-// en yüksek kalite
-async function getBestStream(
-  masterUrl
-){
-
-  const r =
-    await fetch(
-      masterUrl
-    );
-
-
-  const text =
-    await r.text();
-
-
-  const lines =
-    text.split("\n");
-
-
-  let variants =
-    [];
-
-
-  for(
-    let i=0;
-    i<lines.length;
-    i++
-  ){
-
-    if(
-      lines[i].startsWith(
-        "#EXT-X-STREAM-INF"
-      )
-    ){
-
-      const bw =
-        parseInt(
-          lines[i]
-            .match(
-              /BANDWIDTH=(\d+)/
-            )?.[1] || 0
-        );
-
-
-      let streamUrl =
-        lines[i+1];
-
-
-      // relative url fix
-      if(
-        !streamUrl.startsWith(
-          "http"
-        )
-      ){
-
-        streamUrl =
-          new URL(
-            streamUrl,
-            masterUrl
-          ).href;
-
-      }
-
-
-      variants.push({
-
-        bw,
-
-        url:
-          streamUrl
-
-      });
-
-    }
-
-  }
-
-
-  if(
-    variants.length===0
-  ){
-    return masterUrl;
-  }
-
-
-  variants.sort(
-    (a,b)=>
-      b.bw-a.bw
-  );
-
-
-  return variants[0].url;
 }
 
 
@@ -354,21 +194,10 @@ export default {
     }
 
 
-    let streamUrl =
-      null;
-
-
-    if(
-      channel.type===
-      "youtube"
-    ){
-
-      streamUrl =
-        await resolveYouTube(
-          channel.id
-        );
-
-    }
+    const streamUrl =
+      await resolveYouTube(
+        channel.id
+      );
 
 
     if(
@@ -385,24 +214,9 @@ export default {
     }
 
 
-    const bestUrl =
-      await getBestStream(
-        streamUrl
-      );
-
-
     const stream =
       await fetch(
-        bestUrl,
-        {
-          headers:{
-            "User-Agent":
-              "Mozilla/5.0",
-
-            "Referer":
-              "https://www.youtube.com/"
-          }
-        }
+        streamUrl
       );
 
 
@@ -418,7 +232,7 @@ export default {
             "*",
 
           "Cache-Control":
-            "public,max-age=20"
+            "public,max-age=15"
 
         }
       }
