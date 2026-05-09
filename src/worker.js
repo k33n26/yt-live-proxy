@@ -12,19 +12,13 @@ async function getChannels() {
 
 function getCache(videoId){
 
-  const item =
-    cache.get(videoId);
+  const item = cache.get(videoId);
 
   if(!item) return null;
 
-  if(
-    Date.now() >
-    item.expire
-  ){
+  if(Date.now() > item.expire){
 
-    cache.delete(
-      videoId
-    );
+    cache.delete(videoId);
 
     return null;
   }
@@ -33,33 +27,22 @@ function getCache(videoId){
 }
 
 
-function setCache(
-  videoId,
-  url
-){
+function setCache(videoId,url){
 
-  cache.set(
-    videoId,
-    {
-      url,
-
-      expire:
-        Date.now() + 30000
-    }
-  );
+  cache.set(videoId,{
+    url,
+    expire:
+      Date.now()+30000
+  });
 
 }
 
 
 
-async function resolveYouTube(
-  videoId
-){
+async function resolveYouTube(videoId){
 
   const cached =
-    getCache(
-      videoId
-    );
+    getCache(videoId);
 
   if(cached){
     return cached;
@@ -69,28 +52,20 @@ async function resolveYouTube(
   const clients = [
 
     {
-      clientName:
-        "ANDROID",
-
-      clientVersion:
-        "20.10.38"
+      clientName:"ANDROID",
+      clientVersion:"20.10.38"
     },
 
     {
-      clientName:
-        "TVHTML5",
-
-      clientVersion:
-        "7.202.0"
+      clientName:"TVHTML5",
+      clientVersion:"7.202.0"
     }
 
   ];
 
 
-  for(
-    const client
-    of clients
-  ){
+  // youtubei dene
+  for(const client of clients){
 
     try{
 
@@ -102,15 +77,11 @@ async function resolveYouTube(
 
             headers:{
               "content-type":
-                "application/json",
-
-              "Connection":
-                "keep-alive"
+                "application/json"
             },
 
             body:
               JSON.stringify({
-
                 videoId,
 
                 context:{
@@ -143,11 +114,54 @@ async function resolveYouTube(
 
       }
 
-    }catch(e){
-      continue;
+    }catch(e){}
+  }
+
+
+  // fallback
+  try{
+
+    const res =
+      await fetch(
+        `https://www.youtube.com/get_video_info?video_id=${videoId}&hl=en`
+      );
+
+
+    const text =
+      await res.text();
+
+
+    const params =
+      new URLSearchParams(
+        text
+      );
+
+
+    const pr =
+      JSON.parse(
+        params.get(
+          "player_response"
+        ) || "{}"
+      );
+
+
+    const hls =
+      pr?.streamingData
+        ?.hlsManifestUrl;
+
+
+    if(hls){
+
+      setCache(
+        videoId,
+        hls
+      );
+
+      return hls;
+
     }
 
-  }
+  }catch(e){}
 
 
   return null;
@@ -180,9 +194,7 @@ export default {
       channels[name];
 
 
-    if(
-      !channel
-    ){
+    if(!channel){
 
       return new Response(
         "not found",
@@ -200,9 +212,7 @@ export default {
       );
 
 
-    if(
-      !streamUrl
-    ){
+    if(!streamUrl){
 
       return new Response(
         "stream not available",
