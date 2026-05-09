@@ -1,17 +1,20 @@
 const CHANNELS_URL =
 "https://raw.githubusercontent.com/k33n26/yt-live-proxy/main/channels.json";
 
-let manifestCache = new Map();
+const manifestCache = new Map();
 
 
 async function getChannels() {
-  const r = await fetch(CHANNELS_URL);
+  const r = await fetch(CHANNELS_URL, {
+    cf: { cacheTtl: 60 }
+  });
+
   return await r.json();
 }
 
 
 // cache
-function getCached(videoId){
+function getCached(videoId, allowExpired = false){
 
   const item =
     manifestCache.get(videoId);
@@ -19,12 +22,17 @@ function getCached(videoId){
   if(!item) return null;
 
   if(
-    Date.now() >
-    item.expire
+    Date.now() > item.expire
   ){
+
+    if(allowExpired){
+      return item.url;
+    }
+
     manifestCache.delete(
       videoId
     );
+
     return null;
   }
 
@@ -41,10 +49,35 @@ function setCache(
     videoId,
     {
       url,
+
       expire:
-        Date.now() + 30000
+        Date.now() + 60000
     }
   );
+
+}
+
+
+// manifest gerçekten yaşıyor mu?
+async function isAlive(url){
+
+  try{
+
+    const r =
+      await fetch(
+        url,
+        {
+          method:"HEAD"
+        }
+      );
+
+    return r.ok;
+
+  }catch(e){
+
+    return false;
+
+  }
 
 }
 
@@ -54,47 +87,61 @@ async function resolveYouTube(
   videoId
 ){
 
+  // önce cache
   const cached =
-    getCached(videoId);
+    getCached(
+      videoId
+    );
 
-  if(cached){
+  if(
+    cached &&
+    await isAlive(
+      cached
+    )
+  ){
     return cached;
   }
 
 
-  const endpoints = [
+  const clients = [
 
     {
-      url:
-        "https://www.youtube.com/youtubei/v1/player",
-      type:"post"
+      clientName:
+        "ANDROID",
+
+      clientVersion:
+        "20.10.38"
     },
 
     {
-      url:
-        "https://www.youtube.com/get_video_info",
-      type:"get"
+      clientName:
+        "TVHTML5",
+
+      clientVersion:
+        "7.202.0"
+    },
+
+    {
+      clientName:
+        "IOS",
+
+      clientVersion:
+        "20.10.4"
     }
 
   ];
 
 
   for(
-    const ep
-    of endpoints
+    const client
+    of clients
   ){
 
     try{
 
-      let res;
-
-
-      if(
-        ep.type==="post"
-      ){
-
-        res = await fetch(
-          ep.url,
+      const res =
+        await fetch(
+          "https://www.youtube.com/youtubei/v1/player",
           {
             method:"POST",
 
@@ -105,16 +152,11 @@ async function resolveYouTube(
 
             body:
               JSON.stringify({
+
                 videoId,
 
                 context:{
-                  client:{
-                    clientName:
-                      "ANDROID",
-
-                    clientVersion:
-                      "20.10.38"
-                  }
+                  client
                 }
 
               })
@@ -123,65 +165,28 @@ async function resolveYouTube(
         );
 
 
-        const json =
-          await res.json();
+      const json =
+        await res.json();
 
 
-        const hls =
-          json?.streamingData
-            ?.hlsManifestUrl;
+      const hls =
+        json?.streamingData
+          ?.hlsManifestUrl;
 
 
-        if(hls){
+      if(
+        hls &&
+        await isAlive(
+          hls
+        )
+      ){
 
-          setCache(
-            videoId,
-            hls
-          );
+        setCache(
+          videoId,
+          hls
+        );
 
-          return hls;
-        }
-
-      }else{
-
-        res =
-          await fetch(
-            `${ep.url}?video_id=${videoId}&hl=en`
-          );
-
-
-        const text =
-          await res.text();
-
-
-        const params =
-          new URLSearchParams(
-            text
-          );
-
-
-        const pr =
-          JSON.parse(
-            params.get(
-              "player_response"
-            ) || "{}"
-          );
-
-
-        const hls =
-          pr?.streamingData
-            ?.hlsManifestUrl;
-
-
-        if(hls){
-
-          setCache(
-            videoId,
-            hls
-          );
-
-          return hls;
-        }
+        return hls;
 
       }
 
@@ -190,6 +195,24 @@ async function resolveYouTube(
     }
 
   }
+
+
+  // stale cache fallback
+  const stale =
+    getCached(
+      videoId,
+      true
+    );
+
+  if(
+    stale &&
+    await isAlive(
+      stale
+    )
+  ){
+    return stale;
+  }
+
 
   return null;
 }
@@ -205,6 +228,7 @@ async function getBestStream(
     await fetch(
       masterUrl
     );
+
 
   const text =
     await r.text();
@@ -239,12 +263,32 @@ async function getBestStream(
         );
 
 
+      let streamUrl =
+        lines[i+1];
+
+
+      // relative url fix
+      if(
+        !streamUrl.startsWith(
+          "http"
+        )
+      ){
+
+        streamUrl =
+          new URL(
+            streamUrl,
+            masterUrl
+          ).href;
+
+      }
+
+
       variants.push({
 
         bw,
 
         url:
-          lines[i+1]
+          streamUrl
 
       });
 
@@ -299,12 +343,14 @@ export default {
     if(
       !channel
     ){
+
       return new Response(
         "not found",
         {
           status:404
         }
       );
+
     }
 
 
@@ -364,6 +410,7 @@ export default {
       stream.body,
       {
         headers:{
+
           "content-type":
             "application/vnd.apple.mpegurl",
 
@@ -371,7 +418,8 @@ export default {
             "*",
 
           "Cache-Control":
-            "public,max-age=15"
+            "public,max-age=20"
+
         }
       }
     );
