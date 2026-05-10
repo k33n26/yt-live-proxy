@@ -1,6 +1,0 @@
-#EXTM3U
-#EXTINF:-1 tvg-id="BizimEvTv" tvg-logo="https://logo.com/bizim.png" group-title="Belgesel",BizimEvTv
-https://kytv.k33n26.workers.dev/BizimEvTv.m3u8
-
-#EXTINF:-1 tvg-id="Bizimkiler" tvg-logo="https://logo.com/bizim.png" group-title="Dizi-Film",Bizimkiler
-https://kytv.k33n26.workers.dev/Bizimkiler.m3u8
