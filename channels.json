@@ -194,5 +194,9 @@
   "amazon1": {
     "type": "youtube",
     "id": "z1KOQ8T42fk"
+  },
+  "amazon2": {
+    "type": "youtube",
+    "id": "W47WrmQeCNM"
   }
 }
