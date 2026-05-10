@@ -1,14 +1,210 @@
 {
-  "BizimEvTv": {
+  "trtnostalji": {
     "type": "youtube",
-    "id": "8s8If_TmxDM",
-    "group": "Belgesel",
-    "logo": "https://logo.com/bizim.png"
+    "id": "jvC6-s5exnI"
   },
-  "Bizimkiler": {
+  "bizimevtv": {
     "type": "youtube",
-    "id": "jvC6-s5exnI",
-    "group": "Dizi-Film",
-    "logo": "https://logo.com/bizim.png"
+    "id": "8s8If_TmxDM"
+  },
+  "guldur": {
+    "type": "youtube",
+    "id": "Jv8HS8gqV78"
+  },
+  "sabantv": {
+    "type": "youtube",
+    "id": "VkXvDzJyUQs"
+  },
+  "sominetv": {
+    "type": "youtube",
+    "id": "mKCieTImjvU"
+  },
+  "yesilcam": {
+    "type": "youtube",
+    "id": "RqegY0WKtZA"
+  },
+  "bspor": {
+    "type": "youtube",
+    "id": "i7UpPgxfZZ8"
+  },
+  "cicek": {
+    "type": "youtube",
+    "id": "6SkIsrCIPfQ"
+  },
+  "gulsah": {
+    "type": "youtube",
+    "id": "tWWFY5lf1U0"
+  },
+  "avsar": {
+    "type": "youtube",
+    "id": "TNU04a1AbE0"
+  },
+  "nature": {
+    "type": "youtube",
+    "id": "gC_YZh_OHRc"
+  },
+  "turkfilm": {
+    "type": "youtube",
+    "id": "cKVuxje7YqA"
+  },
+  "fanatikfilm": {
+    "type": "youtube",
+    "id": "IlvBegAhh-s"
+  },
+  "turkfilm2": {
+    "type": "youtube",
+    "id": "OVBj1CBRZqM"
+  },
+  "ersoy": {
+    "type": "youtube",
+    "id": "UOAYih1mj2Q"
+  },
+  "seksenler": {
+    "type": "youtube",
+    "id": "qGYlF1MiMxw"
+  },
+  "showmax": {
+    "type": "youtube",
+    "id": "Y3vGHFrsqrs"
+  },
+  "yedinumara": {
+    "type": "youtube",
+    "id": "rS5dHYQsSxs"
+  },
+  "leylamecnun": {
+    "type": "youtube",
+    "id": "3nlND4audLg"
+  },
+  "adanali": {
+    "type": "youtube",
+    "id": "sF1AgroEr60"
+  },
+  "carton": {
+    "type": "youtube",
+    "id": "qTjU24F8hrQ"
+  },
+  "relax": {
+    "type": "youtube",
+    "id": "CkchxBUtXu4"
+  },
+  "tgrtb": {
+    "type": "youtube",
+    "id": "32y7IEtD5OU"
+  },
+  "topraktv": {
+    "type": "youtube",
+    "id": "ZFfbkJ26nnQ"
+  },
+  "bushcraft": {
+    "type": "youtube",
+    "id": "zpesXnlV5ak"
+  },
+  "dunya": {
+    "type": "youtube",
+    "id": "OMz7Pdp8t48"
+  },
+  "avrupa": {
+    "type": "youtube",
+    "id": "SYQ2X8GWOWM"
+  },
+  "turkiye": {
+    "type": "youtube",
+    "id": "TPSG2Xmnu5A"
+  },
+  "emret": {
+    "type": "youtube",
+    "id": "6kQpSqTkN88"
+  },
+  "kurt": {
+    "type": "youtube",
+    "id": "FpHquhm1-3o"
+  },
+  "kurtpusu": {
+    "type": "youtube",
+    "id": "4QICVoMeA4s"
+  },
+  "koyun": {
+    "type": "youtube",
+    "id": "j6Mo4ZbQ5Yo"
+  },
+  "behzat": {
+    "type": "youtube",
+    "id": "-5_l1YGwgfQ"
+  },
+  "aspor": {
+    "type": "youtube",
+    "id": "mgeW8Qm8-SY"
+  },
+  "halktv": {
+    "type": "youtube",
+    "id": "8uNelFh0oz4"
+  },
+  "szctv": {
+    "type": "youtube",
+    "id": "ztmY_cCtUl0"
+  },
+  "cnnturk": {
+    "type": "youtube",
+    "id": "6N8_r2uwLEc"
+  },
+  "ntv": {
+    "type": "youtube",
+    "id": "pqq5c6k70kk"
+  },
+  "ahaber": {
+    "type": "youtube",
+    "id": "nmY9i63t6qo"
+  },
+  "lider": {
+    "type": "youtube",
+    "id": "eaQtymwph3U"
+  },
+  "haberturk": {
+    "type": "youtube",
+    "id": "RNVNlJSUFoE"
+  },
+  "haberglobal": {
+    "type": "youtube",
+    "id": "EqoCJ8BPxtE"
+  },
+  "krt": {
+    "type": "youtube",
+    "id": "9SjCdNwD0x0"
+  },
+  "dreamlife": {
+    "type": "youtube",
+    "id": "kEkGomMorqU"
+  },
+  "waterfall": {
+    "type": "youtube",
+    "id": "eZUrjlbSxkU"
+  },
+  "calmriver": {
+    "type": "youtube",
+    "id": "GaWiUYMuFfk"
+  },
+  "amazingplace": {
+    "type": "youtube",
+    "id": "VABzf7Ig4l4"
+  },
+  "hiddenmountain": {
+    "type": "youtube",
+    "id": "ZYr0ulJDXCE"
+  },
+  "amazon1": {
+    "type": "youtube",
+    "id": "z1KOQ8T42fk"
+  },
+  "amazon2": {
+    "type": "youtube",
+    "id": "W47WrmQeCNM"
+  },
+  "tlcsuc": {
+    "type": "youtube",
+    "id": "mNWridzb-Ls"
+  },
+  "rainy1": {
+    "type": "youtube",
+    "id": "UROOEpcIFwA"
   }
 }
