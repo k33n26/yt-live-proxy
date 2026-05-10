@@ -146,5 +146,9 @@
   "cnnturk": {
     "type": "youtube",
     "id": "6N8_r2uwLEc"
+  },
+  "ntv": {
+    "type": "youtube",
+    "id": "pqq5c6k70kk"
   }
 }
