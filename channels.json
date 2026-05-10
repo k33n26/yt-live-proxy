@@ -138,5 +138,9 @@
   "halktv": {
     "type": "youtube",
     "id": "8uNelFh0oz4"
+  },
+  "szctv": {
+    "type": "youtube",
+    "id": "ztmY_cCtUl0"
   }
 }
