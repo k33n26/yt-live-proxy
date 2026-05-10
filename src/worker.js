@@ -5,124 +5,67 @@ const cache = new Map();
 
 
 async function getChannels() {
-
-  const r =
-    await fetch(
-      CHANNELS_URL
-    );
-
+  const r = await fetch(CHANNELS_URL);
   return await r.json();
-
 }
 
 
+function getCache(videoId){
 
-function getCache(
-  videoId
-){
+  const item = cache.get(videoId);
 
-  const item =
-    cache.get(
-      videoId
-    );
+  if(!item) return null;
 
+  if(Date.now() > item.expire){
 
-  if(
-    !item
-  ){
-    return null;
-  }
-
-
-  if(
-    Date.now() >
-    item.expire
-  ){
-
-    cache.delete(
-      videoId
-    );
+    cache.delete(videoId);
 
     return null;
-
   }
-
 
   return item.url;
+}
+
+
+function setCache(videoId,url){
+
+  cache.set(videoId,{
+    url,
+    expire:
+      Date.now()+30000
+  });
 
 }
 
 
 
-function setCache(
-  videoId,
-  url
-){
-
-  cache.set(
-    videoId,
-    {
-
-      url,
-
-      expire:
-        Date.now() +
-        30000
-
-    }
-  );
-
-}
-
-
-
-// youtube çöz
-async function resolveYouTube(
-  videoId
-){
+async function resolveYouTube(videoId){
 
   const cached =
-    getCache(
-      videoId
-    );
+    getCache(videoId);
 
-
-  if(
-    cached
-  ){
-
+  if(cached){
     return cached;
-
   }
 
 
   const clients = [
 
     {
-      clientName:
-        "ANDROID",
-
-      clientVersion:
-        "20.10.38"
+      clientName:"ANDROID",
+      clientVersion:"20.10.38"
     },
 
     {
-      clientName:
-        "TVHTML5",
-
-      clientVersion:
-        "7.202.0"
+      clientName:"TVHTML5",
+      clientVersion:"7.202.0"
     }
 
   ];
 
 
-
-  // youtubei
-  for(
-    const client
-    of clients
-  ){
+  // youtubei dene
+  for(const client of clients){
 
     try{
 
@@ -130,26 +73,19 @@ async function resolveYouTube(
         await fetch(
           "https://www.youtube.com/youtubei/v1/player",
           {
-
-            method:
-              "POST",
+            method:"POST",
 
             headers:{
-
               "content-type":
                 "application/json"
-
             },
 
             body:
               JSON.stringify({
-
                 videoId,
 
                 context:{
-
                   client
-
                 }
 
               })
@@ -167,24 +103,19 @@ async function resolveYouTube(
           ?.hlsManifestUrl;
 
 
-      if(
-        hls
-      ){
+      if(hls){
 
         setCache(
           videoId,
           hls
         );
 
-
         return hls;
 
       }
 
     }catch(e){}
-
   }
-
 
 
   // fallback
@@ -192,9 +123,7 @@ async function resolveYouTube(
 
     const res =
       await fetch(
-
-`https://www.youtube.com/get_video_info?video_id=${videoId}&hl=en`
-
+        `https://www.youtube.com/get_video_info?video_id=${videoId}&hl=en`
       );
 
 
@@ -210,11 +139,9 @@ async function resolveYouTube(
 
     const pr =
       JSON.parse(
-
         params.get(
           "player_response"
         ) || "{}"
-
       );
 
 
@@ -223,15 +150,12 @@ async function resolveYouTube(
         ?.hlsManifestUrl;
 
 
-    if(
-      hls
-    ){
+    if(hls){
 
       setCache(
         videoId,
         hls
       );
-
 
       return hls;
 
@@ -241,177 +165,21 @@ async function resolveYouTube(
 
 
   return null;
-
-}
-
-
-
-// 🔥 maksimum 1080p seç
-async function getBest1080Stream(
-  masterUrl
-){
-
-  try{
-
-    const r =
-      await fetch(
-        masterUrl
-      );
-
-
-    const text =
-      await r.text();
-
-
-    const lines =
-      text.split(
-        "\n"
-      );
-
-
-    let variants =
-      [];
-
-
-    for(
-      let i=0;
-      i<lines.length;
-      i++
-    ){
-
-      const line =
-        lines[i];
-
-
-      if(
-
-        line.startsWith(
-          "#EXT-X-STREAM-INF"
-        )
-
-      ){
-
-        const match =
-          line.match(
-
-/RESOLUTION=\d+x(\d+)/
-
-          );
-
-
-        const height =
-          parseInt(
-
-            match?.[1] ||
-            0
-
-          );
-
-
-        let streamUrl =
-          lines[i+1];
-
-
-        // relative link fix
-        if(
-
-          !streamUrl.startsWith(
-            "http"
-          )
-
-        ){
-
-          streamUrl =
-            new URL(
-              streamUrl,
-              masterUrl
-            ).href;
-
-        }
-
-
-        variants.push({
-
-          height,
-
-          url:
-            streamUrl
-
-        });
-
-      }
-
-    }
-
-
-    if(
-      variants.length===0
-    ){
-
-      return masterUrl;
-
-    }
-
-
-    // 1080 ve altı
-    const filtered =
-      variants.filter(
-
-        x=>
-          x.height<=1080
-
-      );
-
-
-    const list =
-
-      filtered.length
-        ? filtered
-        : variants;
-
-
-    list.sort(
-
-      (a,b)=>
-
-        b.height-
-        a.height
-
-    );
-
-
-    return list[0].url;
-
-  }catch(e){
-
-    return masterUrl;
-
-  }
-
 }
 
 
 
 export default {
 
-  async fetch(
-    req
-  ){
+  async fetch(req){
 
     const url =
-      new URL(
-        req.url
-      );
+      new URL(req.url);
 
 
     const name =
       url.pathname
-
-        .replace(
-          "/",
-          ""
-        )
-
+        .replace("/","")
         .replace(
           ".m3u8",
           ""
@@ -426,9 +194,7 @@ export default {
       channels[name];
 
 
-    if(
-      !channel
-    ){
+    if(!channel){
 
       return new Response(
         "not found",
@@ -446,9 +212,7 @@ export default {
       );
 
 
-    if(
-      !streamUrl
-    ){
+    if(!streamUrl){
 
       return new Response(
         "stream not available",
@@ -460,28 +224,19 @@ export default {
     }
 
 
-    // 🔥 burada kalite seçiliyor
-    const bestUrl =
-      await getBest1080Stream(
-        streamUrl
-      );
-
-
     const stream =
       await fetch(
-        bestUrl
+        streamUrl
       );
 
 
     return new Response(
       stream.body,
       {
-
         headers:{
 
           "content-type":
-
-"application/vnd.apple.mpegurl",
+            "application/vnd.apple.mpegurl",
 
           "Access-Control-Allow-Origin":
             "*",
@@ -490,7 +245,6 @@ export default {
             "public,max-age=15"
 
         }
-
       }
     );
 
