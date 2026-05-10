@@ -142,5 +142,9 @@
   "szctv": {
     "type": "youtube",
     "id": "ztmY_cCtUl0"
+  },
+  "cnnturk": {
+    "type": "youtube",
+    "id": "6N8_r2uwLEc"
   }
 }
