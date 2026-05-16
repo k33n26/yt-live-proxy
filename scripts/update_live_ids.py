@@ -25,7 +25,6 @@ def get_video_id_from_handle(handle):
         html = r.text
 
 
-        # canonical
         m = re.search(
             r'"canonicalBaseUrl":"\/watch\?v=([A-Za-z0-9_-]{11})"',
             html
@@ -35,7 +34,6 @@ def get_video_id_from_handle(handle):
             return m.group(1)
 
 
-        # fallback
         m = re.search(
             r'watch\?v=([A-Za-z0-9_-]{11})',
             html
@@ -44,88 +42,12 @@ def get_video_id_from_handle(handle):
         if m:
             return m.group(1)
 
+
     except Exception:
         pass
 
 
     return None
-
-
-
-
-def is_live(video_id):
-
-    clients = [
-
-        {
-            "clientName": "ANDROID",
-            "clientVersion": "20.10.38"
-        },
-
-        {
-            "clientName": "TVHTML5",
-            "clientVersion": "7.202.0"
-        }
-
-    ]
-
-
-    for client in clients:
-
-        try:
-
-            r = requests.post(
-
-                "https://www.youtube.com/youtubei/v1/player",
-
-                headers={
-                    "content-type":
-                        "application/json"
-                },
-
-                json={
-
-                    "videoId":
-                        video_id,
-
-                    "context": {
-
-                        "client":
-                            client
-
-                    }
-
-                },
-
-                timeout=20
-
-            )
-
-
-            data = r.json()
-
-
-            hls = (
-                data
-                .get(
-                    "streamingData",
-                    {}
-                )
-                .get(
-                    "hlsManifestUrl"
-                )
-            )
-
-
-            if hls:
-                return True
-
-
-        except Exception:
-            continue
-
-
-    return False
 
 
 
@@ -147,7 +69,9 @@ for name, channel in data.items():
         continue
 
 
-    handle = channel.get("handle")
+    handle = channel.get(
+        "handle"
+    )
 
 
     if not handle:
@@ -168,17 +92,6 @@ for name, channel in data.items():
 
         print(
             f"{name}: id bulunamadı"
-        )
-
-        continue
-
-
-    if not is_live(
-        new_id
-    ):
-
-        print(
-            f"{name}: canlı yayın yok"
         )
 
         continue
