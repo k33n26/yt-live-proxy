@@ -204,18 +204,22 @@
   },
   "haberglobal": {
     "type": "youtube",
+    "handle": "@haberglobal",
     "id": "EqoCJ8BPxtE"
   },
   "krt": {
     "type": "youtube",
+    "handle": "@krtcanli",
     "id": "9SjCdNwD0x0"
   },
   "dreamlife": {
     "type": "youtube",
+    "handle": "@John.Statham8386",
     "id": "kEkGomMorqU"
   },
   "waterfall": {
     "type": "youtube",
+    "handle": "@MiParaisoVision",
     "id": "eZUrjlbSxkU"
   },
   "calmriver": {
@@ -232,6 +236,7 @@
   },
   "amazon1": {
     "type": "youtube",
+    "handle": "@Amazon4KUHD",
     "id": "z1KOQ8T42fk"
   },
   "amazon2": {
@@ -240,6 +245,7 @@
   },
   "tlcsuc": {
     "type": "youtube",
+    "handle": "@TLCSucveArastirma",
     "id": "mNWridzb-Ls"
   },
   "rainy1": {
