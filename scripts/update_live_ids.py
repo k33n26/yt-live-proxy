@@ -5,34 +5,83 @@ import requests
 FILE = "channels.json"
 
 
-def get_video_id_from_handle(handle):
+HEADERS = {
+
+    "User-Agent":
+
+        "Mozilla/5.0"
+
+}
+
+
+
+def get_video_id_from_handle(
+    handle
+):
 
     try:
 
-        url = f"https://www.youtube.com/{handle}/live"
+        url = (
+            f"https://www.youtube.com/"
+            f"{handle}/live"
+        )
+
 
         r = requests.get(
+
             url,
-            allow_redirects=True,
+
+            headers=
+                HEADERS,
+
             timeout=20
+
         )
+
+
+        html = r.text
+
 
         m = re.search(
-            r"watch\?v=([A-Za-z0-9_-]{11})",
-            r.url
+
+            r'"canonicalBaseUrl":"\/watch\?v=([A-Za-z0-9_-]{11})"',
+
+            html
+
         )
 
+
         if m:
+
             return m.group(1)
+
+
+        m = re.search(
+
+            r'watch\?v=([A-Za-z0-9_-]{11})',
+
+            html
+
+        )
+
+
+        if m:
+
+            return m.group(1)
+
 
     except Exception:
         pass
+
 
     return None
 
 
 
-def is_live(video_id):
+
+def is_live(
+    video_id
+):
 
     try:
 
@@ -41,8 +90,10 @@ def is_live(video_id):
             "https://www.youtube.com/youtubei/v1/player",
 
             headers={
+
                 "content-type":
                     "application/json"
+
             },
 
             json={
@@ -80,17 +131,16 @@ def is_live(video_id):
         )
 
 
-        if details.get(
-            "isLive"
-        ):
-            return True
+        return details.get(
+            "isLive",
+            False
+        )
 
 
     except Exception:
-        pass
 
+        return False
 
-    return False
 
 
 
@@ -107,7 +157,10 @@ changed = False
 
 for name, channel in data.items():
 
-    if channel.get("type") != "youtube":
+    if (
+        channel.get("type")
+        != "youtube"
+    ):
         continue
 
 
@@ -120,8 +173,10 @@ for name, channel in data.items():
         continue
 
 
-    new_id = get_video_id_from_handle(
-        handle
+    new_id = (
+        get_video_id_from_handle(
+            handle
+        )
     )
 
 
@@ -153,10 +208,14 @@ for name, channel in data.items():
     if old_id != new_id:
 
         print(
-            f"{name}: {old_id} -> {new_id}"
+f"{name}: {old_id} -> {new_id}"
         )
 
-        channel["id"] = new_id
+
+        channel["id"] = (
+            new_id
+        )
+
 
         changed = True
 
@@ -171,17 +230,27 @@ for name, channel in data.items():
 if changed:
 
     with open(
+
         FILE,
+
         "w",
+
         encoding="utf-8"
+
     ) as f:
 
         json.dump(
+
             data,
+
             f,
+
             indent=2,
+
             ensure_ascii=False
+
         )
+
 
     print(
         "channels.json güncellendi"
