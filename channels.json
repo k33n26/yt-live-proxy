@@ -250,6 +250,7 @@
   },
   "rainy1": {
     "type": "youtube",
+    "handle": "@rainyindonesia23",
     "id": "UROOEpcIFwA"
   },
   "rainy2": {
@@ -274,6 +275,7 @@
   },
   "ocean1": {
     "type": "youtube",
+    "handle": "@OceanRelaxationFilm-rw3mp",
     "id": "_8J7ReF-1kY"
   },
   "akvaryum4k": {
@@ -282,62 +284,77 @@
   },
   "tv100": {
     "type": "youtube",
+    "handle": "@tv100",
     "id": "ebVRSmBYC60"
   },
   "ayakasi": {
     "type": "youtube",
+    "handle": "@AvrupaYakasi",
     "id": "NGsjOrzwjZk"
   },
   "rafadan": {
     "type": "youtube",
+    "handle": "@trtcocuk",
     "id": "iWGWWFfYWig"
   },
   "apara": {
     "type": "youtube",
+    "handle": "@apara",
     "id": "6-Q8v_e-M2g"
   },
   "cnbce": {
     "type": "youtube",
+    "handle": "@cnbce",
     "id": "aZ3ycSbSYBA"
   },
   "24tv": {
     "type": "youtube",
+    "handle": "@YirmidortTV",
     "id": "6B-nPOdP720"
   },
   "kralakustik": {
     "type": "youtube",
+    "handle": "@kralmüzik",
     "id": "O_-NjHABJIg"
   },
   "htspor": {
     "type": "youtube",
+    "handle": "@htspor",
     "id": "ih2KAtA50I4"
   },
   "discoverynaked": {
     "type": "youtube",
+    "handle": "@discovery",
     "id": "XOt-Gd_-wS4"
   },
   "tvnet": {
     "type": "youtube",
+    "handle": "@TVNET",
     "id": "Z5bqy4gwEmc"
   },
   "kismet": {
     "type": "youtube",
+    "handle": "@KismetseOlurKanalDOFFICIAL",
     "id": "R7zIWyGdLLQ"
   },
   "tele2": {
     "type": "youtube",
+    "handle": "@tele2_haber",
     "id": "OhRUDRKa_dk"
   },
   "ciftcitv": {
     "type": "youtube",
+    "handle": "@CiftciTV",
     "id": "6snZ0b6b9ec"
   },
   "egemax": {
     "type": "youtube",
+    "handle": "@egemaxtv",
     "id": "UJ8_nBZGd0M"
   },
   "trthaber": {
     "type": "youtube",
+    "handle": "@trthaber",
     "id": "rrGdpqwEhag"
   }
 }
