@@ -154,42 +154,52 @@
   },
   "koyun": {
     "type": "youtube",
+    "handle": "@ShauntheSheepOfficial",
     "id": "j6Mo4ZbQ5Yo"
   },
   "behzat": {
     "type": "youtube",
+    "handle": "@Behzatc.",
     "id": "-5_l1YGwgfQ"
   },
   "aspor": {
     "type": "youtube",
+    "handle": "@ASpor",
     "id": "mgeW8Qm8-SY"
   },
   "halktv": {
     "type": "youtube",
+    "handle": "@Halktvkanali",
     "id": "8uNelFh0oz4"
   },
   "szctv": {
     "type": "youtube",
+    "handle": "@Sozcutelevizyonu",
     "id": "ztmY_cCtUl0"
   },
   "cnnturk": {
     "type": "youtube",
+    "handle": "@cnnturk",
     "id": "6N8_r2uwLEc"
   },
   "ntv": {
     "type": "youtube",
+    "handle": "@NTV",
     "id": "pqq5c6k70kk"
   },
   "ahaber": {
     "type": "youtube",
+    "handle": "@Ahaber",
     "id": "nmY9i63t6qo"
   },
   "lider": {
     "type": "youtube",
+    "handle": "@liderhabertv",
     "id": "eaQtymwph3U"
   },
   "haberturk": {
     "type": "youtube",
+    "handle": "@haberturktv",
     "id": "RNVNlJSUFoE"
   },
   "haberglobal": {
