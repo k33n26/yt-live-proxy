@@ -153,7 +153,6 @@
   },
   "ahaber": {
     "type": "youtube",
-    "handle": "@Ahaber",
     "id": "nmY9i63t6qo"
   },
   "lider": {
@@ -238,87 +237,70 @@
   },
   "tv100": {
     "type": "youtube",
-    "handle": "@tv100",
-    "id": "5i9EixeFRoE"
+    "id": "ebVRSmBYC60"
   },
   "ayakasi": {
     "type": "youtube",
-    "handle": "@AvrupaYakasi",
-    "id": "sW_SLtl399s"
+    "id": "NGsjOrzwjZk"
   },
   "rafadan": {
     "type": "youtube",
-    "handle": "@trtcocuk",
-    "id": "WP9soQviMXM"
+    "id": "iWGWWFfYWig"
   },
   "apara": {
     "type": "youtube",
-    "handle": "@apara",
-    "id": "n6DiKQZJAJ4"
+    "id": "6-Q8v_e-M2g"
   },
   "cnbce": {
     "type": "youtube",
-    "handle": "@cnbce",
-    "id": "n6DiKQZJAJ4"
+    "id": "aZ3ycSbSYBA"
   },
   "24tv": {
     "type": "youtube",
-    "handle": "@YirmidortTV",
-    "id": "NDd_cTezfAA"
+    "id": "6B-nPOdP720"
   },
   "kralakustik": {
     "type": "youtube",
-    "handle": "@kralmüzik",
-    "id": "8YuE3BCp7i4"
+    "id": "O_-NjHABJIg"
   },
   "htspor": {
     "type": "youtube",
-    "handle": "@htspor",
-    "id": "gCPJO_vDtQc"
+    "id": "gcWaPe_LBMc"
   },
   "discoverynaked": {
     "type": "youtube",
-    "handle": "@discovery",
-    "id": "gqDCrdZVZnk"
+    "id": "XOt-Gd_-wS4"
   },
   "tvnet": {
     "type": "youtube",
-    "handle": "@TVNET",
-    "id": "s3lReyStoBs"
+    "id": "Z5bqy4gwEmc"
   },
   "kismet": {
     "type": "youtube",
-    "handle": "@KismetseOlurKanalDOFFICIAL",
     "id": "R7zIWyGdLLQ"
   },
   "tele2": {
     "type": "youtube",
-    "handle": "@tele2_haber",
     "id": "Z8Qjtt7fMj8"
   },
   "ciftcitv": {
     "type": "youtube",
-    "handle": "@CiftciTV",
-    "id": "akLUPnTokGc"
+    "id": "6snZ0b6b9ec"
   },
   "egemax": {
     "type": "youtube",
-    "handle": "@egemaxtv",
-    "id": "Em0oIYX1lYo"
+    "id": "UJ8_nBZGd0M"
   },
   "trthaber": {
     "type": "youtube",
-    "handle": "@trthaber",
-    "id": "friwqY7n7io"
+    "id": "rrGdpqwEhag"
   },
   "tgrthaber": {
     "type": "youtube",
-    "handle": "@tgrthaber",
-    "id": "sRBaMYuhK0k"
+    "id": "0SAUIyvNA5s"
   },
   "bloomberght": {
     "type": "youtube",
-    "handle": "@BloombergHT",
-    "id": "n6DiKQZJAJ4"
+    "id": "hHSmBJk6w0c"
   }
 }
