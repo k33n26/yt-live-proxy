@@ -6,69 +6,43 @@ FILE = "channels.json"
 
 
 HEADERS = {
-
-    "User-Agent":
-
-        "Mozilla/5.0"
-
+    "User-Agent": "Mozilla/5.0"
 }
 
 
-
-def get_video_id_from_handle(
-    handle
-):
+def get_video_id_from_handle(handle):
 
     try:
 
-        url = (
-            f"https://www.youtube.com/"
-            f"{handle}/live"
-        )
-
+        url = f"https://www.youtube.com/{handle}/live"
 
         r = requests.get(
-
             url,
-
-            headers=
-                HEADERS,
-
+            headers=HEADERS,
             timeout=20
-
         )
-
 
         html = r.text
 
 
+        # canonical
         m = re.search(
-
             r'"canonicalBaseUrl":"\/watch\?v=([A-Za-z0-9_-]{11})"',
-
             html
-
         )
 
-
         if m:
-
             return m.group(1)
 
 
+        # fallback
         m = re.search(
-
             r'watch\?v=([A-Za-z0-9_-]{11})',
-
             html
-
         )
 
-
         if m:
-
             return m.group(1)
-
 
     except Exception:
         pass
@@ -79,67 +53,79 @@ def get_video_id_from_handle(
 
 
 
-def is_live(
-    video_id
-):
+def is_live(video_id):
 
-    try:
+    clients = [
 
-        r = requests.post(
+        {
+            "clientName": "ANDROID",
+            "clientVersion": "20.10.38"
+        },
 
-            "https://www.youtube.com/youtubei/v1/player",
+        {
+            "clientName": "TVHTML5",
+            "clientVersion": "7.202.0"
+        }
 
-            headers={
+    ]
 
-                "content-type":
-                    "application/json"
 
-            },
+    for client in clients:
 
-            json={
+        try:
 
-                "videoId":
-                    video_id,
+            r = requests.post(
 
-                "context": {
+                "https://www.youtube.com/youtubei/v1/player",
 
-                    "client": {
+                headers={
+                    "content-type":
+                        "application/json"
+                },
 
-                        "clientName":
-                            "ANDROID",
+                json={
 
-                        "clientVersion":
-                            "20.10.38"
+                    "videoId":
+                        video_id,
+
+                    "context": {
+
+                        "client":
+                            client
 
                     }
 
-                }
+                },
 
-            },
+                timeout=20
 
-            timeout=20
-
-        )
+            )
 
 
-        data = r.json()
+            data = r.json()
 
 
-        details = data.get(
-            "videoDetails",
-            {}
-        )
+            hls = (
+                data
+                .get(
+                    "streamingData",
+                    {}
+                )
+                .get(
+                    "hlsManifestUrl"
+                )
+            )
 
 
-        return details.get(
-            "isLive",
-            False
-        )
+            if hls:
+                return True
 
 
-    except Exception:
+        except Exception:
+            continue
 
-        return False
+
+    return False
 
 
 
@@ -157,26 +143,24 @@ changed = False
 
 for name, channel in data.items():
 
-    if (
-        channel.get("type")
-        != "youtube"
-    ):
+    if channel.get("type") != "youtube":
         continue
 
 
-    handle = channel.get(
-        "handle"
-    )
+    handle = channel.get("handle")
 
 
     if not handle:
+
+        print(
+            f"{name}: handle yok"
+        )
+
         continue
 
 
-    new_id = (
-        get_video_id_from_handle(
-            handle
-        )
+    new_id = get_video_id_from_handle(
+        handle
     )
 
 
@@ -194,7 +178,7 @@ for name, channel in data.items():
     ):
 
         print(
-            f"{name}: live değil"
+            f"{name}: canlı yayın yok"
         )
 
         continue
@@ -208,14 +192,10 @@ for name, channel in data.items():
     if old_id != new_id:
 
         print(
-f"{name}: {old_id} -> {new_id}"
+            f"{name}: {old_id} -> {new_id}"
         )
 
-
-        channel["id"] = (
-            new_id
-        )
-
+        channel["id"] = new_id
 
         changed = True
 
@@ -230,27 +210,17 @@ f"{name}: {old_id} -> {new_id}"
 if changed:
 
     with open(
-
         FILE,
-
         "w",
-
         encoding="utf-8"
-
     ) as f:
 
         json.dump(
-
             data,
-
             f,
-
             indent=2,
-
             ensure_ascii=False
-
         )
-
 
     print(
         "channels.json güncellendi"
