@@ -5,11 +5,11 @@ import requests
 FILE = "channels.json"
 
 
-def get_live_id(handle):
-
-    url = f"https://www.youtube.com/{handle}/live"
+def get_video_id_from_handle(handle):
 
     try:
+
+        url = f"https://www.youtube.com/{handle}/live"
 
         r = requests.get(
             url,
@@ -29,6 +29,68 @@ def get_live_id(handle):
         pass
 
     return None
+
+
+
+def is_live(video_id):
+
+    try:
+
+        r = requests.post(
+
+            "https://www.youtube.com/youtubei/v1/player",
+
+            headers={
+                "content-type":
+                    "application/json"
+            },
+
+            json={
+
+                "videoId":
+                    video_id,
+
+                "context": {
+
+                    "client": {
+
+                        "clientName":
+                            "ANDROID",
+
+                        "clientVersion":
+                            "20.10.38"
+
+                    }
+
+                }
+
+            },
+
+            timeout=20
+
+        )
+
+
+        data = r.json()
+
+
+        details = data.get(
+            "videoDetails",
+            {}
+        )
+
+
+        if details.get(
+            "isLive"
+        ):
+            return True
+
+
+    except Exception:
+        pass
+
+
+    return False
 
 
 
@@ -58,15 +120,28 @@ for name, channel in data.items():
         continue
 
 
-    new_id = get_live_id(
+    new_id = get_video_id_from_handle(
         handle
     )
 
 
     if not new_id:
+
         print(
-            f"{name}: live yok"
+            f"{name}: id bulunamadı"
         )
+
+        continue
+
+
+    if not is_live(
+        new_id
+    ):
+
+        print(
+            f"{name}: live değil"
+        )
+
         continue
 
 
@@ -84,6 +159,12 @@ for name, channel in data.items():
         channel["id"] = new_id
 
         changed = True
+
+    else:
+
+        print(
+            f"{name}: aynı"
+        )
 
 
 
