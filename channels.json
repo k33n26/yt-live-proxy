@@ -402,5 +402,9 @@
   "earthtv": {
     "type": "youtube",
     "id": "HfgIFGbdGJ0"
+  },
+  "euronews": {
+    "type": "youtube",
+    "id": "pykpO5kQJ98"
   }
 }
