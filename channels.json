@@ -418,5 +418,9 @@
   "skynews": {
     "type": "youtube",
     "id": "YDvsBbKfLPA"
+  },
+  "france24": {
+    "type": "youtube",
+    "id": "Ap-UM1O9RBU"
   }
 }
