@@ -398,5 +398,9 @@
   "nasa1": {
     "type": "youtube",
     "id": "FuuC4dpSQ1M"
+  },
+  "earthtv": {
+    "type": "youtube",
+    "id": "HfgIFGbdGJ0"
   }
 }
