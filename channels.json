@@ -422,5 +422,9 @@
   "france24": {
     "type": "youtube",
     "id": "Ap-UM1O9RBU"
+  },
+  "abcnewsau": {
+    "type": "youtube",
+    "id": "vOTiJkg1voo"
   }
 }
