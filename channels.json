@@ -406,5 +406,9 @@
   "euronews": {
     "type": "youtube",
     "id": "pykpO5kQJ98"
+  },
+  "dwnews": {
+    "type": "youtube",
+    "id": "LuKwFajn37U"
   }
 }
