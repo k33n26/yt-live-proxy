@@ -550,5 +550,9 @@
   "taiwannews": {
     "type": "youtube",
     "id": "w87VGpgd90U"
+  },
+  "taiwanebc": {
+    "type": "youtube",
+    "id": "V1p33hqPrUk"
   }
 }
