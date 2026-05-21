@@ -542,5 +542,9 @@
   "cctv4": {
     "type": "youtube",
     "id": "vNVp6bxkL1c"
+  },
+  "globalnews": {
+    "type": "youtube",
+    "id": "6IquAgfvYmc"
   }
 }
