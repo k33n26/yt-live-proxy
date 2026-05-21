@@ -546,5 +546,9 @@
   "globalnews": {
     "type": "youtube",
     "id": "6IquAgfvYmc"
+  },
+  "taiwannews": {
+    "type": "youtube",
+    "id": "w87VGpgd90U"
   }
 }
